@@ -1,0 +1,18 @@
+﻿
+> frontend@0.0.0 build
+> tsc -b && vite build
+
+[36mvite v7.3.1 [32mbuilding client environment for production...[36m[39m
+transforming...
+[32mÔ£ô[39m 4003 modules transformed.
+rendering chunks...
+computing gzip size...
+[2mdist/[22m[32mregisterSW.js                                      [39m[1m[2m    0.13 kB[22m[1m[22m
+[2mdist/[22m[32mmanifest.webmanifest                               [39m[1m[2m    0.35 kB[22m[1m[22m
+[2mdist/[22m[32mindex.html                                         [39m[1m[2m    0.58 kB[22m[1m[22m[2m Ôöé gzip:   0.34 kB[22m
+[2mdist/[22m[32massets/geist-cyrillic-wght-normal-CHSlOQsW.woff2   [39m[1m[2m   14.69 kB[22m[1m[22m
+[2mdist/[22m[32massets/geist-latin-ext-wght-normal-DMtmJ5ZE.woff2  [39m[1m[2m   15.31 kB[22m[1m[22m
+[2mdist/[22m[32massets/geist-latin-wght-normal-Dm3htQBi.woff2      [39m[1m[2m   28.40 kB[22m[1m[22m
+[2mdist/[22m[35massets/index-CKXy2jiB.css                          [39m[1m[2m   50.75 kB[22m[1m[22m[2m Ôöé gzip:   9.50 kB[22m
+[2mdist/[22m[36massets/index-BVHUtyqc.js                           [39m[1m[33m2,658.08 kB[39m[22m[2m Ôöé gzip: 855.80 kB[22m
+[32mÔ£ô built in 42.75s[39m

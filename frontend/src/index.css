@@ -1,0 +1,51 @@
+@import "@fontsource-variable/geist";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-slate-50 text-slate-900;
+    font-family: 'Geist Variable', sans-serif;
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-white/70 backdrop-blur-lg border border-white/40 dark:bg-slate-950/60 dark:border-slate-800/50 shadow-xl;
+  }
+  .glass-panel {
+    @apply bg-slate-50/80 backdrop-blur-xl border border-slate-200/50 dark:bg-slate-900/80 dark:border-slate-800/50 shadow-lg;
+  }
+  .glass-nav {
+    @apply bg-white/80 backdrop-blur-md border-t border-slate-200/50 dark:bg-slate-950/80 dark:border-slate-800/50 shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.1)];
+  }
+}
