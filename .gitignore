@@ -1,0 +1,23 @@
+# Logs e DB
+*.log
+*.sqlite
+*.db
+
+# Node (Frontend)
+node_modules/
+dist/
+dev-dist/
+.env.local
+
+# Python (Backend)
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+.env
+
+# SO e Editores
+.DS_Store
+.vscode/
+.idea/

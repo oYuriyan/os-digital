@@ -1,0 +1,51 @@
+﻿
+Configuração de IP do Windows
+
+
+Adaptador Ethernet Ethernet:
+
+   Sufixo DNS específico de conexão. . . . . . : rede.microsistema
+   Endereço IPv6 . . . . . . . . . . : fd42:bad:c0de:1337::1a3f
+   Endereço IPv6 . . . . . . . . . . : fd42:bad:c0de:1337:2018:1457:8553:ff19
+   Endereço IPv6 Temporário. . . . . . . . : fd42:bad:c0de:1337:156b:e0c9:c664:2349
+   Endereço IPv6 de link local . . . . . . . . : fe80::d251:eff:dc01:595a%22
+   Endereço IPv4. . . . . . . .  . . . . . . . : 172.16.20.92
+   Máscara de Sub-rede . . . . . . . . . . . . : 255.255.255.0
+   Gateway Padrão. . . . . . . . . . . . . . . : fe80::a65d:36ff:fe29:5821%22
+                                                 172.16.20.2
+
+Adaptador de Rede sem Fio Wi-Fi:
+
+   Estado da mídia. . . . . . . . . . . . . .  : mídia desconectada
+   Sufixo DNS específico de conexão. . . . . . : rede.microsistema
+
+Adaptador de Rede sem Fio Conexão Local* 9:
+
+   Estado da mídia. . . . . . . . . . . . . .  : mídia desconectada
+   Sufixo DNS específico de conexão. . . . . . : 
+
+Adaptador de Rede sem Fio Conexão Local* 10:
+
+   Estado da mídia. . . . . . . . . . . . . .  : mídia desconectada
+   Sufixo DNS específico de conexão. . . . . . : 
+
+Adaptador Ethernet Conexão de Rede Bluetooth:
+
+   Estado da mídia. . . . . . . . . . . . . .  : mídia desconectada
+   Sufixo DNS específico de conexão. . . . . . : 
+
+Adaptador Ethernet vEthernet (Default Switch):
+
+   Sufixo DNS específico de conexão. . . . . . : 
+   Endereço IPv6 de link local . . . . . . . . : fe80::463a:b82a:2841:51bb%21
+   Endereço IPv4. . . . . . . .  . . . . . . . : 172.25.208.1
+   Máscara de Sub-rede . . . . . . . . . . . . : 255.255.240.0
+   Gateway Padrão. . . . . . . . . . . . . . . : 
+
+Adaptador Ethernet vEthernet (WSL (Hyper-V firewall)):
+
+   Sufixo DNS específico de conexão. . . . . . : 
+   Endereço IPv6 de link local . . . . . . . . : fe80::8279:ebe4:1ae5:fd0%32
+   Endereço IPv4. . . . . . . .  . . . . . . . : 172.30.208.1
+   Máscara de Sub-rede . . . . . . . . . . . . : 255.255.240.0
+   Gateway Padrão. . . . . . . . . . . . . . . : 

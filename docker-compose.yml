@@ -1,0 +1,44 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: os_digital_db
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: administ
+      POSTGRES_DB: os_digital
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: os_digital_backend
+    restart: always
+    ports:
+      - "8001:8000"
+    environment:
+      # O backend enxerga o BD através do nome do serviço "db" na rede bridge do Docker
+      - DATABASE_URL=postgresql://admin:administ@db:5432/os_digital
+      - SECRET_KEY=minha_chave_ultra_secreta_aqui_123*
+      - ALGORITHM=HS256
+      - ACCESS_TOKEN_EXPIRE_MINUTES=480
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: os_digital_frontend
+    restart: always
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
