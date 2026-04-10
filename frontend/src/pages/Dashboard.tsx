@@ -411,10 +411,10 @@ export function Dashboard() {
             <div className="h-48 flex items-center justify-center text-sm text-slate-400">Sem dados.</div>
           ) : (
             <ResponsiveContainer width="100%" height={220}>
-              <BarChart data={rankingTecnicos} layout="vertical" margin={{ top: 0, right: 16, left: 8, bottom: 0 }}>
+              <BarChart data={rankingTecnicos} layout="vertical" margin={{ top: 0, right: 16, left: 32, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={false} />
                 <XAxis type="number" tick={{ fontSize: 10, fill: "#94a3b8" }} tickLine={false} axisLine={false} allowDecimals={false} />
-                <YAxis type="category" dataKey="nome" tick={{ fontSize: 11, fill: "#475569" }} tickLine={false} axisLine={false} width={60} />
+                <YAxis type="category" dataKey="nome" tick={{ fontSize: 11, fill: "#475569" }} tickLine={false} axisLine={false} width={90} />
                 <Tooltip content={<CustomTooltip />} />
                 <Bar dataKey="total" name="OS Atendidas" fill="#6366f1" radius={[0, 4, 4, 0]} maxBarSize={20} />
               </BarChart>

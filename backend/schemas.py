@@ -12,6 +12,13 @@ class ClienteBase(BaseModel):
 class ClienteCreate(ClienteBase):
     pass
 
+class ClienteUpdate(BaseModel):
+    razao_social: Optional[str] = None
+    cnpj: Optional[str] = None
+    email: Optional[str] = None
+    telefone: Optional[str] = None
+    endereco: Optional[str] = None
+
 class ClienteResponse(ClienteBase):
     id: UUID4
 

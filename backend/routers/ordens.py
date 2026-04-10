@@ -101,8 +101,22 @@ def atualizar_os(os_id: str, os_atualizada: schemas.OrdemServicoUpdate, db: Sess
     
     # Grava o histórico antes de aplicar as mudanças
     if os_atualizada.usuario_nome:
-        texto_auditoria = f"Atualizou a OS. Status movido para: {os_atualizada.status}"
-        if os_atualizada.status == "fechada":
+        pos_conclusao = db_os.status in ["fechada", "concluída", "concluida"]
+        
+        mudancas = []
+        if os_atualizada.descricao_servico is not None and os_atualizada.descricao_servico != db_os.descricao_servico:
+            mudancas.append("Relatório técnico editado")
+        if os_atualizada.equipamento_retirado is not None and os_atualizada.equipamento_retirado != db_os.equipamento_retirado:
+            mudancas.append("Equipamento retirado modificado")
+        if os_atualizada.status is not None and os_atualizada.status != db_os.status:
+            mudancas.append(f"Status alterado ({db_os.status} -> {os_atualizada.status})")
+            
+        texto_auditoria = "Alterações: " + ", ".join(mudancas) if mudancas else "Atualização na OS"
+        
+        if pos_conclusao:
+            texto_auditoria = "[PÓS-CONCLUSÃO] " + texto_auditoria
+            # Reforçamos no back-end que a assinatura será mantida (apenas logar e pronto)
+        elif os_atualizada.status == "fechada" and not pos_conclusao:
             texto_auditoria = "Encerrou o atendimento e coletou a assinatura do cliente."
 
         novo_historico = models.HistoricoOS(

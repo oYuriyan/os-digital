@@ -78,7 +78,6 @@ export function EditarOS() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (osTrancada) return
 
     setSalvando(true)
     try {
@@ -88,12 +87,16 @@ export function EditarOS() {
       }
 
       if (formData.status === "fechada") {
-        if (!sigCanvas.current || sigCanvas.current.isEmpty()) {
-          toast.warning("Assinatura Obrigatória", { description: "O cliente precisa assinar para finalizar." })
-          setSalvando(false)
-          return
+        if (!osTrancada) {
+          if (!sigCanvas.current || sigCanvas.current.isEmpty()) {
+            toast.warning("Assinatura Obrigatória", { description: "O cliente precisa assinar para finalizar." })
+            setSalvando(false)
+            return
+          }
+          dadosParaEnviar.assinatura_base64 = sigCanvas.current.getCanvas().toDataURL("image/png")
         }
-        dadosParaEnviar.assinatura_base64 = sigCanvas.current.getCanvas().toDataURL("image/png")
+        // Se ela já estiver trancada (fechada original), e continua fechada,
+        // não precisa validar nova assinatura, mantém a original.
       } else {
         delete (dadosParaEnviar as any).assinatura_base64
       }
@@ -337,11 +340,10 @@ export function EditarOS() {
                 <div className="space-y-2">
                   <Label>Status da Operação</Label>
                   <Select
-                    disabled={osTrancada}
                     value={formData.status}
                     onValueChange={(v) => setFormData({ ...formData, status: v })}
                   >
-                    <SelectTrigger className="w-full md:w-1/2 bg-white disabled:opacity-100 disabled:bg-slate-50">
+                    <SelectTrigger className="w-full md:w-1/2 bg-white">
                       <SelectValue placeholder="Selecione o status" />
                     </SelectTrigger>
                     <SelectContent>
@@ -356,8 +358,7 @@ export function EditarOS() {
                   <Label>Relatório de Solução Técnica</Label>
                   <Textarea
                     required
-                    disabled={osTrancada}
-                    className="min-h-[140px] bg-white resize-none disabled:opacity-100 disabled:bg-slate-50"
+                    className="min-h-[140px] bg-white resize-none"
                     placeholder="Descreva detalhadamente o que foi realizado..."
                     value={formData.descricao_servico}
                     onChange={(e) => setFormData({ ...formData, descricao_servico: e.target.value })}
@@ -408,28 +409,28 @@ export function EditarOS() {
                   </div>
                 )}
 
-                {!osTrancada && (
                   <Button
                     type="submit"
                     disabled={salvando}
                     className={`w-full py-6 text-lg transition-all ${
-                      formData.status === "fechada"
+                      formData.status === "fechada" || osTrancada
                         ? "bg-emerald-600 hover:bg-emerald-700 text-white"
                         : "bg-blue-600 hover:bg-blue-700 text-white"
                     }`}
                   >
                     {salvando
                       ? <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                      : formData.status === "fechada"
+                      : formData.status === "fechada" || osTrancada
                         ? <CheckCircle className="mr-2 h-5 w-5" />
                         : <Save className="mr-2 h-5 w-5" />
                     }
-                    {formData.status === "fechada"
-                      ? "Coletar Assinatura e Finalizar"
-                      : "Salvar Andamento Técnico"
+                    {osTrancada 
+                      ? "Salvar Modificação Pós-Conclusão"
+                      : formData.status === "fechada"
+                        ? "Coletar Assinatura e Finalizar"
+                        : "Salvar Andamento Técnico"
                     }
                   </Button>
-                )}
               </form>
             </CardContent>
           </Card>
