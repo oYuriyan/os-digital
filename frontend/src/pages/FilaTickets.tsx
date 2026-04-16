@@ -137,7 +137,7 @@ function ModalChamado({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl w-full flex flex-col gap-0 p-0 overflow-hidden max-h-[85vh] md:max-h-[88vh]">
+      <DialogContent className="max-w-2xl w-full flex flex-col gap-0 p-0 overflow-hidden h-[85vh]">
 
         {/* ── Cabeçalho fixo ── */}
         <DialogHeader className="px-6 pt-6 pb-4 border-b border-slate-100 shrink-0">
@@ -253,7 +253,7 @@ export function FilaTickets() {
       const res = await api.post(`/chamados/${chamadoId}/transformar-em-os`)
       const sugestao = res.data.sugestao_os
       // Navega para Nova OS passando os dados via state
-      navigate("/os/nova", { state: { fromTicket: sugestao } })
+      navigate("/os/nova", { state: { fromTicket: { ...sugestao, chamado_id: res.data.chamado_id } } })
     } catch {
       toast.error("Erro ao preparar dados para a OS.")
     }
