@@ -72,7 +72,7 @@ class ChamadoWhatsApp(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     telefone_origem = Column(String(50), nullable=False, index=True)
     cliente_id = Column(UUID(as_uuid=True), ForeignKey("clientes.id"), nullable=True)
-    status = Column(String(50), default="em_atendimento_ia", nullable=False)
+    status = Column(String(50), default="triagem_ia", nullable=False)
     resumo_ia = Column(Text, nullable=True)
     prioridade_ia = Column(String(20), default="media", nullable=True)
     categoria_ia = Column(String(50), nullable=True)

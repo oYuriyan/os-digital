@@ -333,6 +333,14 @@ export function EditarOS() {
                 </p>
                 <p className="ml-6 text-xs">{osOriginal?.setor}</p>
               </div>
+
+              {/* Destaque do problema relatado */}
+              <div className="pt-3 border-t border-slate-200">
+                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 block">Problema Relatado / Motivo</span>
+                <p className="text-sm font-medium text-slate-800 bg-orange-50/50 p-2.5 rounded-lg border border-orange-100 whitespace-pre-wrap">
+                  {osOriginal?.defeito_relatado || "Nenhum problema detalhado."}
+                </p>
+              </div>
             </CardContent>
           </Card>
 

@@ -57,7 +57,7 @@ async def webhook_evolution(request: Request, db: Session = Depends(get_db)):
         db.query(models.ChamadoWhatsApp)
         .filter(
             models.ChamadoWhatsApp.telefone_origem == telefone,
-            models.ChamadoWhatsApp.status == "em_atendimento_ia",
+            models.ChamadoWhatsApp.status == "triagem_ia",
         )
         .order_by(models.ChamadoWhatsApp.data_hora_criacao.desc())
         .first()
@@ -69,7 +69,7 @@ async def webhook_evolution(request: Request, db: Session = Depends(get_db)):
             id=uuid.uuid4(),
             telefone_origem=telefone,
             cliente_id=cliente_id,
-            status="em_atendimento_ia",
+            status="triagem_ia",
             historico_conversa=[],
         )
         db.add(chamado)
@@ -109,7 +109,7 @@ async def webhook_evolution(request: Request, db: Session = Depends(get_db)):
     chamado.categoria_ia = resultado_ia.get("categoria_ia", "duvida")
 
     if acao == "escalar_humano":
-        chamado.status = "pendente_humano"
+        chamado.status = "aguardando_tecnico"
 
     db.commit()
 

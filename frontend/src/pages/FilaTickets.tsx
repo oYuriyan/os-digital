@@ -45,10 +45,10 @@ const CATEGORIA_CONFIG: Record<string, { label: string; emoji: string }> = {
 }
 
 const STATUS_COLUNAS = [
-  { id: "em_atendimento_ia", label: "Triagem IA",         icon: Zap,          cor: "border-t-blue-500"   },
-  { id: "pendente_humano",   label: "Aguarda Técnico",    icon: AlertTriangle, cor: "border-t-orange-500" },
-  { id: "resolvido_ia",      label: "Resolvido pela IA",  icon: CheckCircle2, cor: "border-t-emerald-500" },
-  { id: "transformado_em_os",label: "Virou OS",           icon: ArrowRight,   cor: "border-t-slate-500"  },
+  { id: "triagem_ia",         label: "Triagem IA",         icon: Zap,          cor: "border-t-blue-500"   },
+  { id: "aguardando_tecnico", label: "Aguardando Técnico", icon: AlertTriangle, cor: "border-t-orange-500" },
+  { id: "resolvido_ia",       label: "Resolvido (IA)",     icon: CheckCircle2, cor: "border-t-emerald-500" },
+  { id: "ordem_gerada",       label: "Ordem Gerada",       icon: ArrowRight,   cor: "border-t-slate-500"  },
 ]
 
 function formatarHora(iso: string) {
@@ -137,7 +137,7 @@ function ModalChamado({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl w-full flex flex-col gap-0 p-0 overflow-hidden max-h-[92vh]">
+      <DialogContent className="max-w-2xl w-full flex flex-col gap-0 p-0 overflow-hidden max-h-[85vh] md:max-h-[88vh]">
 
         {/* ── Cabeçalho fixo ── */}
         <DialogHeader className="px-6 pt-6 pb-4 border-b border-slate-100 shrink-0">
@@ -193,7 +193,7 @@ function ModalChamado({
 
         {/* ── Botões sempre fixos na base ── */}
         <div className="shrink-0 flex flex-col sm:flex-row gap-3 px-6 py-4 border-t border-slate-100 bg-white">
-          {chamado.status === "pendente_humano" ? (
+          {chamado.status === "aguardando_tecnico" ? (
             <>
               <Button
                 variant="outline"

@@ -54,6 +54,16 @@ export function NovaOS() {
 
     try {
       await api.post("/os/", { ...formData, tecnico_id })
+
+      // Se originou de um ticket, marca ele como ordem gerada no novo fluxo
+      if (fromTicket?.chamado_id) {
+        try {
+          await api.patch(`/chamados/${fromTicket.chamado_id}`, { status: "ordem_gerada" })
+        } catch (e) {
+          console.error("Falha ao atualizar status do ticket:", e)
+        }
+      }
+
       toast.success("OS Aberta com Sucesso!", { description: "A ordem de serviço já está no painel." })
       navigate("/dashboard")
     } catch (error) {
