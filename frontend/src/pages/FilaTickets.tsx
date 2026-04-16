@@ -137,10 +137,12 @@ function ModalChamado({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-3">
-            <MessageSquare className="h-5 w-5 text-blue-600" />
+      <DialogContent className="max-w-2xl w-full flex flex-col gap-0 p-0 overflow-hidden max-h-[92vh]">
+
+        {/* ── Cabeçalho fixo ── */}
+        <DialogHeader className="px-6 pt-6 pb-4 border-b border-slate-100 shrink-0">
+          <DialogTitle className="flex items-center gap-3 text-base">
+            <MessageSquare className="h-5 w-5 text-blue-600 shrink-0" />
             Chamado via WhatsApp
             <span className={`ml-auto text-xs px-2 py-1 rounded-full border font-semibold ${prio.color}`}>
               {prio.label}
@@ -148,7 +150,8 @@ function ModalChamado({
           </DialogTitle>
         </DialogHeader>
 
-        <div className="grid grid-cols-2 gap-3 text-sm mb-4 shrink-0">
+        {/* ── Metadados ── */}
+        <div className="grid grid-cols-2 gap-3 text-sm px-6 py-4 shrink-0">
           <div className="bg-slate-50 rounded-lg p-3">
             <p className="text-xs text-slate-500 mb-1">Telefone</p>
             <p className="font-semibold">+{chamado.telefone_origem}</p>
@@ -163,30 +166,34 @@ function ModalChamado({
           </div>
         </div>
 
-        {/* Histórico da conversa */}
-        <div className="flex-1 overflow-y-auto space-y-3 pr-1">
-          <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Transcrição completa</p>
-          {chamado.historico_conversa.map((msg, i) => (
-            <div key={i} className={`flex ${msg.role === "user" ? "justify-start" : "justify-end"}`}>
-              <div className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
-                msg.role === "user"
-                  ? "bg-slate-100 text-slate-800 rounded-tl-sm"
-                  : "bg-blue-600 text-white rounded-tr-sm"
-              }`}>
-                <p>{msg.content}</p>
-                {msg.timestamp && (
-                  <p className={`text-[10px] mt-1 ${msg.role === "user" ? "text-slate-400" : "text-blue-200"}`}>
-                    {formatarHora(msg.timestamp)}
-                  </p>
-                )}
+        {/* ── Histórico com scroll próprio ── */}
+        <div className="flex-1 overflow-y-auto px-6 pb-2 min-h-0">
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">
+            Transcrição completa
+          </p>
+          <div className="space-y-3">
+            {chamado.historico_conversa.map((msg, i) => (
+              <div key={i} className={`flex ${msg.role === "user" ? "justify-start" : "justify-end"}`}>
+                <div className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
+                  msg.role === "user"
+                    ? "bg-slate-100 text-slate-800 rounded-tl-sm"
+                    : "bg-blue-600 text-white rounded-tr-sm"
+                }`}>
+                  <p>{msg.content}</p>
+                  {msg.timestamp && (
+                    <p className={`text-[10px] mt-1 ${msg.role === "user" ? "text-slate-400" : "text-blue-200"}`}>
+                      {formatarHora(msg.timestamp)}
+                    </p>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
 
-        {/* Ações */}
-        <div className="flex gap-3 pt-4 border-t border-slate-100 shrink-0">
-          {chamado.status === "pendente_humano" && (
+        {/* ── Botões sempre fixos na base ── */}
+        <div className="shrink-0 flex flex-col sm:flex-row gap-3 px-6 py-4 border-t border-slate-100 bg-white">
+          {chamado.status === "pendente_humano" ? (
             <>
               <Button
                 variant="outline"
@@ -194,7 +201,10 @@ function ModalChamado({
                 disabled={atualizando}
                 onClick={handleMarcarResolvido}
               >
-                {atualizando ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <CheckCircle2 className="h-4 w-4 mr-2" />}
+                {atualizando
+                  ? <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  : <CheckCircle2 className="h-4 w-4 mr-2" />
+                }
                 Marcar como Resolvido
               </Button>
               <Button
@@ -205,11 +215,13 @@ function ModalChamado({
                 Transformar em OS
               </Button>
             </>
-          )}
-          {chamado.status !== "pendente_humano" && (
-            <p className="text-xs text-slate-400 mx-auto self-center">Nenhuma ação disponível para este status.</p>
+          ) : (
+            <p className="text-xs text-slate-400 mx-auto self-center py-1">
+              Nenhuma ação disponível para este status.
+            </p>
           )}
         </div>
+
       </DialogContent>
     </Dialog>
   )

@@ -1,31 +1,33 @@
 import { useState, useEffect } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useLocation } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ArrowLeft, Save, Loader2 } from "lucide-react"
+import { ArrowLeft, Save, Loader2, MessageSquare } from "lucide-react"
 import { api } from "@/services/api"
 import { toast } from "sonner"
 
 export function NovaOS() {
   const navigate = useNavigate()
-  
+  const location = useLocation()
+
+  // Dados opcionais vindos do botão "Transformar em OS" do Kanban de Tickets
+  const fromTicket = (location.state as any)?.fromTicket ?? null
+
   const [clientes, setClientes] = useState<any[]>([])
   const [carregando, setCarregando] = useState(false)
 
-  // O estado do nosso formulário
   const [formData, setFormData] = useState({
-    cliente_id: "",
-    tipo_servico: "",
-    solicitante: "",
-    setor: "",
-    defeito_relatado: ""
+    cliente_id:       fromTicket?.cliente_id      ?? "",
+    tipo_servico:     fromTicket?.tipo_servico     ?? "",
+    solicitante:      fromTicket?.solicitante      ?? "",
+    setor:            fromTicket?.setor            ?? "",
+    defeito_relatado: fromTicket?.defeito_relatado ?? ""
   })
 
-  // Assim que a tela carrega, busca os clientes na API
   useEffect(() => {
     async function carregarClientes() {
       try {
@@ -42,7 +44,6 @@ export function NovaOS() {
     e.preventDefault()
     setCarregando(true)
 
-    // Pega o ID do técnico logado no cofre do navegador
     const tecnico_id = localStorage.getItem("usuario_id")
 
     if (!tecnico_id) {
@@ -52,15 +53,9 @@ export function NovaOS() {
     }
 
     try {
-      // Envia a nova OS para o Python
-      await api.post("/os/", {
-        ...formData,
-        tecnico_id: tecnico_id
-      })
-      
+      await api.post("/os/", { ...formData, tecnico_id })
       toast.success("OS Aberta com Sucesso!", { description: "A ordem de serviço já está no painel." })
-      navigate("/dashboard") // Manda o técnico de volta pro painel central
-      
+      navigate("/dashboard")
     } catch (error) {
       console.error(error)
       toast.error("Erro", { description: "Não foi possível abrir a OS. Verifique os dados." })
@@ -91,6 +86,18 @@ export function NovaOS() {
             <CardDescription>Selecione o cliente e descreva o problema relatado.</CardDescription>
           </CardHeader>
           <CardContent>
+            {/* Banner quando oriundo de um Ticket WhatsApp */}
+            {fromTicket && (
+              <div className="mb-5 flex items-start gap-3 rounded-lg border border-blue-200 bg-blue-50 p-4">
+                <MessageSquare className="mt-0.5 h-5 w-5 shrink-0 text-blue-600" />
+                <div>
+                  <p className="text-sm font-semibold text-blue-800">Originado de Ticket WhatsApp</p>
+                  <p className="text-xs text-blue-600 mt-0.5">
+                    Os campos foram pré-preenchidos com as informações coletadas pelo agente de IA. Revise antes de salvar.
+                  </p>
+                </div>
+              </div>
+            )}
             <form onSubmit={handleSubmit} className="space-y-6">
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -98,7 +105,11 @@ export function NovaOS() {
                 {/* Seleção de Cliente */}
                 <div className="space-y-2">
                   <Label htmlFor="cliente">Cliente / Empresa</Label>
-                  <Select required onValueChange={(valor) => setFormData({ ...formData, cliente_id: valor })}>
+                  <Select
+                    required
+                    value={formData.cliente_id}
+                    onValueChange={(valor) => setFormData({ ...formData, cliente_id: valor })}
+                  >
                     <SelectTrigger className="bg-white">
                       <SelectValue placeholder="Selecione um cliente..." />
                     </SelectTrigger>
@@ -115,7 +126,11 @@ export function NovaOS() {
                 {/* Tipo de Serviço */}
                 <div className="space-y-2">
                   <Label htmlFor="tipo_servico">Tipo de Serviço</Label>
-                  <Select required onValueChange={(valor) => setFormData({ ...formData, tipo_servico: valor })}>
+                  <Select
+                    required
+                    value={formData.tipo_servico}
+                    onValueChange={(valor) => setFormData({ ...formData, tipo_servico: valor })}
+                  >
                     <SelectTrigger className="bg-white">
                       <SelectValue placeholder="Selecione..." />
                     </SelectTrigger>
