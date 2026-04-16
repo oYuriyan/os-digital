@@ -8,12 +8,12 @@ def seed_admin():
         admin = Usuario(
             nome="Administrador Chefe",
             login="admin",
-            senha_hash=get_password_hash("admin123"),
+            senha_hash=get_password_hash("adminad12"),
             cargo="Gestor / Admin"
         )
         db.add(admin)
         db.commit()
-        print("Usuário Admin (admin) criado com a senha 'admin123'")
+        print("Usuário Admin (admin) criado com a senha 'adminad12'")
     else:
         print("Admin já existe. Seed ignorado.")
 

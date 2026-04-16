@@ -79,6 +79,14 @@ export function EditarOS() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
+    const mudouAlgo = formData.descricao_servico !== osOriginal.descricao_servico ||
+                      formData.status !== osOriginal.status;
+
+    if (osTrancada && !mudouAlgo) {
+      toast.info("Atenção", { description: "Nenhuma modificação foi feita." })
+      return
+    }
+
     setSalvando(true)
     try {
       let dadosParaEnviar = {
@@ -132,10 +140,12 @@ export function EditarOS() {
     window.open(`mailto:${destinatario}?subject=${assunto}&body=${corpo}`)
   }
 
-  const handleWhatsApp = () => {
-    // Formata o telefone para o padrão internacional (remove tudo que não é dígito)
+  const handleWhatsAppCliente = () => {
     const foneRaw = cliente?.telefone?.replace(/\D/g, "") ?? ""
-    // Adiciona DDI 55 se não tiver
+    if (!foneRaw) {
+      toast.warning("Telefone não cadastrado", { description: "Este cliente não possui telefone." })
+      return
+    }
     const fone = foneRaw.startsWith("55") ? foneRaw : `55${foneRaw}`
 
     const msg = encodeURIComponent(
@@ -148,6 +158,22 @@ export function EditarOS() {
       `Atenciosamente, *Micro Sistema Soluções*`
     )
     window.open(`https://wa.me/${fone}?text=${msg}`, "_blank")
+  }
+
+  const handleWhatsAppEmpresa = () => {
+    // Número padrão da empresa (pode ser ajustado posteriormente)
+    const foneEmpresa = "5511999999999" 
+    
+    // Mensagem interna formatada para a Gestão
+    const msg = encodeURIComponent(
+      `*NOVA OS CONCLUÍDA - #${String(osOriginal?.numero_os).padStart(4, "0")}*\n\n` +
+      `👔 *Cliente:* ${cliente?.razao_social ?? ""}\n` +
+      `🛠️ *Serviço:* ${osOriginal?.tipo_servico}\n` +
+      `🧑‍🔧 *Técnico:* ${tecnico?.nome ?? ""}\n\n` +
+      `*Resumo do Fechamento:*\n${osOriginal?.descricao_servico ?? ""}\n\n` +
+      `Relatório em anexo na plataforma Web.`
+    )
+    window.open(`https://wa.me/${foneEmpresa}?text=${msg}`, "_blank")
   }
 
   if (carregando) return (
@@ -214,7 +240,7 @@ export function EditarOS() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {/* Baixar PDF */}
             <PDFDownloadLink
               document={
@@ -255,14 +281,24 @@ export function EditarOS() {
               Enviar por E-mail
             </Button>
 
-            {/* Enviar por WhatsApp */}
+            {/* Enviar WhatsApp Cliente */}
             <Button
               variant="outline"
               className="w-full border-green-200 text-green-700 hover:bg-green-50 gap-2"
-              onClick={handleWhatsApp}
+              onClick={handleWhatsAppCliente}
             >
               <MessageCircle className="h-4 w-4 text-green-500" />
-              Enviar WhatsApp
+              WA Cliente
+            </Button>
+
+            {/* Enviar WhatsApp Empresa */}
+            <Button
+              variant="outline"
+              className="w-full border-emerald-200 text-emerald-800 hover:bg-emerald-50 gap-2"
+              onClick={handleWhatsAppEmpresa}
+            >
+              <MessageCircle className="h-4 w-4 text-emerald-600" />
+              WA Empresa
             </Button>
           </div>
         </div>
