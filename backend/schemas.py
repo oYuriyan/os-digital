@@ -103,3 +103,32 @@ class UsuarioUpdate(BaseModel):
     nome: Optional[str] = None
     login: Optional[str] = None
     cargo: Optional[str] = None
+
+
+# ── Schemas de Chamados / Tickets WhatsApp ────────────────────────────────────
+
+class MensagemConversaItem(BaseModel):
+    """Representa uma única mensagem no histórico da conversa."""
+    role: str  # "cliente" ou "assistente"
+    conteudo: str
+    timestamp: Optional[str] = None
+
+class ChamadoWhatsAppResponse(BaseModel):
+    id: UUID4
+    telefone_origem: str
+    cliente_id: Optional[UUID4] = None
+    status: str
+    resumo_ia: Optional[str] = None
+    prioridade_ia: Optional[str] = None
+    categoria_ia: Optional[str] = None
+    historico_conversa: List[Dict] = []
+    data_hora_criacao: Optional[datetime] = None
+    os_id_gerada: Optional[UUID4] = None
+
+    class Config:
+        from_attributes = True
+
+class ChamadoWhatsAppUpdate(BaseModel):
+    status: Optional[str] = None
+    prioridade_ia: Optional[str] = None
+    categoria_ia: Optional[str] = None

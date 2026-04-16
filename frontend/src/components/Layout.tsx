@@ -6,7 +6,8 @@ import {
   Settings, 
   LogOut,
   FileText,
-  Building2
+  Building2,
+  MessageSquare
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
@@ -32,10 +33,11 @@ export function Layout() {
 
   // Definição das rotas do menu
   const menuItens = [
-    { titulo: "Painel Central", icone: LayoutDashboard, rota: "/dashboard" },
-    { titulo: "Ordens de Serviço", icone: FileText, rota: "/os" },
-    { titulo: "Clientes", icone: Building2, rota: "/clientes" },
-    { titulo: "Equipe", icone: Users, rota: "/equipe" },
+    { titulo: "Painel Central",      icone: LayoutDashboard, rota: "/dashboard" },
+    { titulo: "Ordens de Serviço",   icone: FileText,         rota: "/os"        },
+    { titulo: "Tickets / Fila L1",   icone: MessageSquare,   rota: "/tickets"   },
+    { titulo: "Clientes",            icone: Building2,        rota: "/clientes"  },
+    { titulo: "Equipe",              icone: Users,            rota: "/equipe"    },
   ]
 
   const NavLinks = () => (

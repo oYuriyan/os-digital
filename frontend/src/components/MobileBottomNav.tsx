@@ -1,15 +1,16 @@
 import { Link, useLocation } from "react-router-dom"
-import { LayoutDashboard, FileText, Building2, Users } from "lucide-react"
+import { LayoutDashboard, FileText, Building2, Users, MessageSquare } from "lucide-react"
 import { motion } from "framer-motion"
 
 export function MobileBottomNav() {
   const location = useLocation()
 
   const tabs = [
-    { title: "Painel", icon: LayoutDashboard, route: "/dashboard" },
-    { title: "OS", icon: FileText, route: "/os" },
-    { title: "Clientes", icon: Building2, route: "/clientes" },
-    { title: "Equipe", icon: Users, route: "/equipe" },
+    { title: "Painel",   icon: LayoutDashboard, route: "/dashboard" },
+    { title: "OS",       icon: FileText,         route: "/os"       },
+    { title: "Tickets",  icon: MessageSquare,    route: "/tickets"  },
+    { title: "Clientes", icon: Building2,        route: "/clientes" },
+    { title: "Equipe",   icon: Users,            route: "/equipe"   },
   ]
 
   return (

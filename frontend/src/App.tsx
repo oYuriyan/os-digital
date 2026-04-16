@@ -10,6 +10,7 @@ import { ListaOS } from "./pages/ListaOS"
 import { EditarOS } from "./pages/EditarOS"
 import { Clientes } from "./pages/Clientes"
 import { Equipe } from "./pages/Equipe"
+import { FilaTickets } from "./pages/FilaTickets"
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
               
               <Route path="/clientes" element={<Clientes />} />
               <Route path="/equipe" element={<Equipe />} />
+              <Route path="/tickets" element={<FilaTickets />} />
             </Route>
           </Route>
 

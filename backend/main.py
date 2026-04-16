@@ -15,8 +15,8 @@ from logger import logger
 from fastapi.exceptions import RequestValidationError, ResponseValidationError
 from fastapi.responses import JSONResponse
 
-# A criação do banco agora será gerenciada via Alembic
-# models.Base.metadata.create_all(bind=engine)
+# Cria tabelas novas que ainda não existem (não destrói as existentes)
+models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="OS Digital API",
@@ -44,10 +44,11 @@ app.add_middleware(
 def read_root():
     return {"status": "Servidor online", "sistema": "OS Digital"}
 
-from routers import clientes, usuarios, auth, dashboard, ordens
+from routers import clientes, usuarios, auth, dashboard, ordens, webhook_whatsapp
 
 app.include_router(auth.router)
 app.include_router(clientes.router)
 app.include_router(usuarios.router)
 app.include_router(dashboard.router)
 app.include_router(ordens.router)
+app.include_router(webhook_whatsapp.router)

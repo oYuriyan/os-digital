@@ -64,3 +64,21 @@ class HistoricoOS(Base):
 
     # O "Aperto de mão" do Histórico de volta para a OS
     ordem_servico = relationship("OrdemServico", back_populates="historico")
+
+
+class ChamadoWhatsApp(Base):
+    __tablename__ = "chamados_whatsapp"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    telefone_origem = Column(String(50), nullable=False, index=True)
+    cliente_id = Column(UUID(as_uuid=True), ForeignKey("clientes.id"), nullable=True)
+    status = Column(String(50), default="em_atendimento_ia", nullable=False)
+    resumo_ia = Column(Text, nullable=True)
+    prioridade_ia = Column(String(20), default="media", nullable=True)
+    categoria_ia = Column(String(50), nullable=True)
+    historico_conversa = Column(JSONB, default=list, nullable=False)
+    data_hora_criacao = Column(DateTime(timezone=True), server_default=func.now())
+    os_id_gerada = Column(UUID(as_uuid=True), ForeignKey("ordens_servico.id"), nullable=True)
+
+    cliente = relationship("Cliente")
+    ordem_servico = relationship("OrdemServico")
