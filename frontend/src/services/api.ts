@@ -1,8 +1,13 @@
 import axios from 'axios';
 import { toast } from 'sonner';
 
+// Em produção (Docker/deploy), a VITE_API_URL aponta para a URL correta.
+// Em dev local, o backend roda na 8000; no Docker na 8001.
+const API_URL = import.meta.env.VITE_API_URL
+  || `http://${window.location.hostname}:${window.location.hostname === 'localhost' ? '8000' : '8001'}`;
+
 export const api = axios.create({
-  baseURL: `http://${window.location.hostname}:8001`,
+  baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
   },

@@ -28,7 +28,7 @@ def run_reset():
         else:
             print("Usuário 'admin' não encontrado. Recriando...")
             novo_admin = Usuario(
-                nome="Administrador Chefe",
+                nome="Administrador",
                 login="admin",
                 senha_hash=get_password_hash("adminad12"),
                 cargo="Gestor / Admin"
