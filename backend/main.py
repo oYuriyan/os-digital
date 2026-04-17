@@ -44,7 +44,7 @@ app.add_middleware(
 def read_root():
     return {"status": "Servidor online", "sistema": "OS Digital"}
 
-from routers import clientes, usuarios, auth, dashboard, ordens, webhook_whatsapp
+from routers import clientes, usuarios, auth, dashboard, ordens, webhook_whatsapp, evolution
 
 app.include_router(auth.router)
 app.include_router(clientes.router)
@@ -52,3 +52,4 @@ app.include_router(usuarios.router)
 app.include_router(dashboard.router)
 app.include_router(ordens.router)
 app.include_router(webhook_whatsapp.router)
+app.include_router(evolution.router)

@@ -8,6 +8,7 @@ import models
 import schemas
 from database import get_db
 from services.groq_service import processar_mensagem_ia
+from services.evolution_service import enviar_mensagem_whatsapp
 
 router = APIRouter(prefix="/chamados", tags=["Tickets / Chamados WhatsApp"])
 
@@ -112,6 +113,14 @@ async def webhook_evolution(request: Request, db: Session = Depends(get_db)):
         chamado.status = "aguardando_tecnico"
 
     db.commit()
+
+    # ── 5. Envia a resposta do bot de volta para o WhatsApp do cliente ────────
+    if resposta_texto:
+        try:
+            enviar_mensagem_whatsapp(telefone, resposta_texto)
+        except Exception as e:
+            # Não quebra o fluxo se o envio falhar — o ticket já está salvo
+            print(f"[Webhook] Falha ao enviar resposta via Evolution: {e}")
 
     return {
         "ok": True,
