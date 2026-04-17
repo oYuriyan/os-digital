@@ -1,12 +1,11 @@
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { toast } from "sonner"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { api } from "@/services/api"
 import {
-  MessageSquare, Clock, AlertTriangle, ArrowRight,
+  MessageSquare, AlertTriangle, ArrowRight,
   RefreshCw, Wifi, CheckCircle2, Loader2, User, Tag, Zap
 } from "lucide-react"
 

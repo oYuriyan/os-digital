@@ -10,6 +10,9 @@ from database import get_db
 from services.groq_service import processar_mensagem_ia
 from services.evolution_service import enviar_mensagem_whatsapp
 
+# Armazena globalmente o último QR Code recebido via Webhook para Evolution V2
+latest_qr = {}
+
 router = APIRouter(prefix="/chamados", tags=["Tickets / Chamados WhatsApp"])
 
 
@@ -45,6 +48,14 @@ async def webhook_evolution(request: Request, db: Session = Depends(get_db)):
         or data.get("message", {}).get("extendedTextMessage", {}).get("text")
         or data.get("text", "")
     )
+
+    event_type = payload.get("event", "").upper()
+    if event_type in ["QRCODE.UPDATED", "QRCODE_UPDATED", "CONNECTION.UPDATE", "CONNECTION_UPDATE"]:
+        qr_obj = data.get("qrcode", {})
+        base64_val = qr_obj.get("base64") or data.get("base64")
+        if base64_val:
+            latest_qr["base64"] = base64_val
+        return {"ok": True, "msg": "QR Code registrado via Webhook"}
 
     if not telefone or not mensagem_cliente:
         return {"ok": True, "msg": "Evento ignorado (sem telefone/mensagem)"}

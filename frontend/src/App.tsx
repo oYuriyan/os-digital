@@ -11,6 +11,7 @@ import { EditarOS } from "./pages/EditarOS"
 import { Clientes } from "./pages/Clientes"
 import { Equipe } from "./pages/Equipe"
 import { FilaTickets } from "./pages/FilaTickets"
+import { Configuracoes } from "./pages/Configuracoes"
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
               <Route path="/clientes" element={<Clientes />} />
               <Route path="/equipe" element={<Equipe />} />
               <Route path="/tickets" element={<FilaTickets />} />
+              <Route path="/configuracoes" element={<Configuracoes />} />
             </Route>
           </Route>
 

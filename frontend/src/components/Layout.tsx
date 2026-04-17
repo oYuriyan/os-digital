@@ -120,7 +120,7 @@ export function Layout() {
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="cursor-pointer text-slate-600">
+                <DropdownMenuItem onSelect={() => navigate("/configuracoes")} className="cursor-pointer text-slate-600">
                   <Settings className="mr-2 h-4 w-4" />
                   <span>Configurações</span>
                 </DropdownMenuItem>

@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     GROQ_API_KEY: str = ""
     EVOLUTION_API_URL: str = "http://localhost:8080"
     EVOLUTION_API_KEY: str = "osdigital_evo_key_2026"
-    EVOLUTION_INSTANCE_NAME: str = "suporte-os"
+    EVOLUTION_INSTANCE_NAME: str = "atendimento-os"
 
     class Config:
         env_file = ".env"

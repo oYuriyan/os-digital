@@ -22,13 +22,20 @@ def setup_instancia():
         raise HTTPException(status_code=500, detail=f"Falha ao criar instância: {str(e)}")
 
 
+from routers.webhook_whatsapp import latest_qr
+
 @router.get("/qrcode")
 def get_qrcode():
     """
     Retorna o QR Code para parear o WhatsApp com a instância.
-    Abra este endpoint no navegador ou no Swagger para ver o QR code.
+    Em Evolution V2, priorizamos o webhook que populou latest_qr.
     """
     try:
+        # Se recebemos webhook assíncrono com o qr atualizado:
+        if "base64" in latest_qr and latest_qr["base64"]:
+            return {"ok": True, "dados": {"base64": latest_qr["base64"]}}
+        
+        # Fallback (as vezes V1/algumas setups retornam logo de cara)
         resultado = obter_qrcode()
         return {"ok": True, "dados": resultado}
     except Exception as e:

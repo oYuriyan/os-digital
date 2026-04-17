@@ -63,14 +63,25 @@ def criar_instancia() -> dict:
         "integration": "WHATSAPP-BAILEYS",
     }
 
-    resp = httpx.post(
-        _url("/instance/create"),
-        json=payload,
-        headers=_headers(),
-        timeout=30.0,
-    )
-    resp.raise_for_status()
-    return resp.json()
+    try:
+        resp = httpx.post(
+            _url("/instance/create"),
+            json=payload,
+            headers=_headers(),
+            timeout=30.0,
+        )
+        resp.raise_for_status()
+        return resp.json()
+    except httpx.HTTPStatusError as e:
+        try:
+            error_data = e.response.json()
+            if "already in use" in str(error_data):
+                # A instância já existe, isto não é um erro fatal
+                return {"status": "SUCCESS", "message": "Instância já existente"}
+        except:
+            pass
+        print(f"[Evolution] HTTP Error: {e.response.text}")
+        raise
 
 
 def obter_qrcode() -> dict:
