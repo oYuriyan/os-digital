@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import { Settings, Wifi, WifiOff, QrCode, RefreshCw, Power, Loader2, MessageSquare, Bot, ShieldCheck, Info } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -37,19 +37,45 @@ function StatusBadge({ state }: { state: ConnectionState | "loading" }) {
   )
 }
 
+// Helper para garantir que o base64 tem o prefixo correto
+function normalizeBase64(b64: string | null | undefined): string | null {
+  if (!b64) return null
+  return b64.startsWith("data:image") ? b64 : `data:image/png;base64,${b64}`
+}
+
 export function Configuracoes() {
   const [status, setStatus] = useState<ConnectionState | "loading">("loading")
   const [qrcode, setQrcode] = useState<string | null>(null)
   const [carregandoQr, setCarregandoQr] = useState(false)
-  const [setupFeito, setSetupFeito] = useState(false)
+  const [aguardandoWebhook, setAguardandoWebhook] = useState(false)
+  const [segundosEspera, setSegundosEspera] = useState(0)
+  const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  // Persiste no localStorage para sobreviver ao F5
+  const [setupFeito, setSetupFeitoState] = useState(
+    () => localStorage.getItem("evo_setup_feito") === "true"
+  )
+
+  const setSetupFeito = (val: boolean) => {
+    setSetupFeitoState(val)
+    localStorage.setItem("evo_setup_feito", String(val))
+  }
 
   const verificarStatus = useCallback(async () => {
     try {
       const res = await api.get("/evolution/status")
       const data: EvolutionStatus = res.data.dados
-      const state = (data?.instance?.status || data?.state || "close") as ConnectionState
+      // Evolution v2 pode retornar estado em instance.state ou instance.status
+      const state = (
+        data?.instance?.status ||
+        (data?.instance as any)?.state ||
+        data?.state ||
+        "close"
+      ) as ConnectionState
       setStatus(state)
-      if (state === "open") setQrcode(null) // Já conectado, esconde o QR
+      if (state === "open") {
+        setQrcode(null) // Já conectado, esconde o QR
+        setSetupFeito(true) // Marca como configurado
+      }
     } catch {
       setStatus("unknown" as ConnectionState)
     }
@@ -64,10 +90,17 @@ export function Configuracoes() {
 
   const handleSetup = async () => {
     try {
-      await api.post("/evolution/setup")
+      const res = await api.post("/evolution/setup")
       setSetupFeito(true)
-      toast.success("Instância criada!", { description: "Agora gere o QR Code para conectar o WhatsApp." })
-      verificarStatus()
+      // Tenta usar o QR Code que já vem na resposta da criação
+      const qrBase64 = res.data?.qrcode_base64
+      if (qrBase64) {
+        setQrcode(normalizeBase64(qrBase64))
+        toast.success("Instância criada!", { description: "QR Code gerado! Escaneie com o WhatsApp corporativo." })
+      } else {
+        toast.success("Instância criada!", { description: "Clique em 'Gerar QR Code' para conectar o WhatsApp." })
+        verificarStatus()
+      }
     } catch (e: any) {
       // Se a instância já existe, não é um erro real
       const msg = e?.response?.data?.detail || ""
@@ -83,29 +116,63 @@ export function Configuracoes() {
   const handleGerarQR = async () => {
     setCarregandoQr(true)
     setQrcode(null)
+    setAguardandoWebhook(false)
+    setSegundosEspera(0)
+
+    // Para qualquer polling anterior
+    if (pollingRef.current) clearInterval(pollingRef.current)
+
     try {
-      const res = await api.get("/evolution/qrcode")
-      const dados = res.data.dados
-      // A Evolution v2 retorna o base64 em diferentes campos dependendo da versão
-      const base64 =
-        dados?.qrcode?.base64 ||
-        dados?.base64 ||
-        dados?.code ||
-        null
-      if (base64) {
-        setQrcode(base64.startsWith("data:image") ? base64 : `data:image/png;base64,${base64}`)
-        toast.success("QR Code gerado!", { description: "Escaneie com o WhatsApp do celular corporativo." })
-      } else {
-        toast.info("WhatsApp já pode estar conectado. Verifique o status acima.")
-        verificarStatus()
-      }
+      // Passo 1: Força a recriação da instância (dispara o webhook QRCODE_UPDATED)
+      await api.post("/evolution/qrcode/reset")
+      toast.info("Gerando QR Code...", { description: "Aguarde enquanto o WhatsApp prepara o código." })
+      setSetupFeito(true)
     } catch (e: any) {
-      const msg = e?.response?.data?.detail || "Verifique se a instância foi criada primeiro."
-      toast.error("Erro ao gerar QR Code", { description: msg })
-    } finally {
       setCarregandoQr(false)
+      const msg = e?.response?.data?.detail || "Verifique se a Evolution API está acessível."
+      toast.error("Erro ao gerar QR Code", { description: msg })
+      return
     }
+
+    // Passo 2: Polling — verifica a cada 3s por até 45s esperando o webhook
+    setAguardandoWebhook(true)
+    setCarregandoQr(false)
+    let elapsed = 0
+    const MAX_ESPERA = 45
+    const INTERVALO = 3
+
+    pollingRef.current = setInterval(async () => {
+      elapsed += INTERVALO
+      setSegundosEspera(elapsed)
+
+      try {
+        const res = await api.get("/evolution/qrcode")
+        const base64 = res.data?.base64 || null
+
+        if (base64) {
+          clearInterval(pollingRef.current!)
+          pollingRef.current = null
+          setAguardandoWebhook(false)
+          setQrcode(normalizeBase64(base64))
+          toast.success("QR Code pronto!", { description: "Escaneie com o WhatsApp do celular corporativo." })
+        } else if (elapsed >= MAX_ESPERA) {
+          clearInterval(pollingRef.current!)
+          pollingRef.current = null
+          setAguardandoWebhook(false)
+          toast.error("Tempo esgotado", {
+            description: "O QR Code não chegou. Verifique se o webhook da Evolution aponta para o backend."
+          })
+        }
+      } catch {
+        // Ignora erros temporários durante o polling
+      }
+    }, INTERVALO * 1000)
   }
+
+  // Limpa polling ao desmontar o componente
+  useEffect(() => {
+    return () => { if (pollingRef.current) clearInterval(pollingRef.current) }
+  }, [])
 
   const isConectado = status === "open"
 
@@ -151,7 +218,7 @@ export function Configuracoes() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="rounded-lg bg-slate-50 border border-slate-100 p-3 text-xs text-slate-600 space-y-1">
-                <p><span className="font-semibold">Instância:</span> atendimento-os</p>
+                <p><span className="font-semibold">Instância:</span> bot-atendimento-final</p>
                 <p><span className="font-semibold">Gateway:</span> Evolution API v2</p>
                 <p><span className="font-semibold">Webhook:</span> /chamados/webhook/evolution</p>
               </div>
@@ -224,16 +291,27 @@ export function Configuracoes() {
                   ) : (
                     <div className="flex flex-col items-center gap-3 py-4">
                       <div className="h-14 w-14 rounded-full bg-slate-100 flex items-center justify-center">
-                        <QrCode className="h-7 w-7 text-slate-400" />
+                        {aguardandoWebhook
+                          ? <Loader2 className="h-7 w-7 text-slate-400 animate-spin" />
+                          : <QrCode className="h-7 w-7 text-slate-400" />
+                        }
                       </div>
+                      {aguardandoWebhook && (
+                        <div className="text-center space-y-1">
+                          <p className="text-xs font-medium text-slate-600">Aguardando QR Code...</p>
+                          <p className="text-xs text-slate-400">{segundosEspera}s — o WhatsApp está preparando o código</p>
+                        </div>
+                      )}
                       <Button
                         className="gap-2 bg-slate-900 hover:bg-slate-700 text-white"
                         onClick={handleGerarQR}
-                        disabled={carregandoQr}
+                        disabled={carregandoQr || aguardandoWebhook}
                       >
                         {carregandoQr
-                          ? <><Loader2 className="h-4 w-4 animate-spin" /> Gerando...</>
-                          : <><QrCode className="h-4 w-4" /> Gerar QR Code</>
+                          ? <><Loader2 className="h-4 w-4 animate-spin" /> Preparando...</>
+                          : aguardandoWebhook
+                            ? <><Loader2 className="h-4 w-4 animate-spin" /> Aguardando QR...</>
+                            : <><QrCode className="h-4 w-4" /> Gerar QR Code</>
                         }
                       </Button>
                     </div>

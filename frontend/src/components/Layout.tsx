@@ -2,7 +2,6 @@ import { Link, Outlet, useLocation, useNavigate } from "react-router-dom"
 import { 
   LayoutDashboard, 
   Users, 
-  Briefcase, 
   Settings, 
   LogOut,
   FileText,
@@ -67,11 +66,8 @@ export function Layout() {
       
       {/* Sidebar Desktop (Fixa na esquerda) */}
       <aside className="hidden w-64 flex-col bg-slate-950 border-r border-slate-800 md:flex h-full shadow-2xl z-50">
-        <div className="flex h-16 items-center gap-3 px-6 border-b border-slate-800">
-          <div className="h-8 w-8 bg-blue-600 rounded flex items-center justify-center shadow-lg shadow-blue-900/20">
-            <Briefcase className="h-4 w-4 text-white" />
-          </div>
-          <span className="text-lg font-bold text-white tracking-tight">OS Digital</span>
+        <div className="flex h-16 items-center justify-center px-4 border-b border-slate-800">
+          <img src="/logo_oficial.png" alt="Micro Sistema Soluções" className="h-10 object-contain" />
         </div>
         <div className="flex-1 overflow-y-auto py-6 px-4">
           <NavLinks />
@@ -93,11 +89,9 @@ export function Layout() {
         <header className="flex h-16 items-center justify-between border-b border-slate-200 bg-white/80 backdrop-blur-md px-4 md:px-6 shadow-sm z-10 sticky top-0">
           
           {/* Espaçador na Esquerda para Mobile Centralizar o Titulo (Se desejar) */}
-          <div className="flex-1 md:hidden flex items-center gap-2">
-             <div className="h-6 w-6 bg-blue-600 rounded flex items-center justify-center">
-                <Briefcase className="h-3 w-3 text-white" />
-              </div>
-             <span className="font-bold text-slate-900">OS Digital</span>
+          <div className="flex-1 md:hidden flex items-center gap-3">
+             <img src="/watermark_oficial.png" alt="Logo" className="h-7 w-7 object-contain" />
+             <span className="font-bold text-slate-900 tracking-tight">Micro Sistema</span>
           </div>
           <div className="hidden md:flex flex-1" /> {/* Espaçador Desktop */}
 

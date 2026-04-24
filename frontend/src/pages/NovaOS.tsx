@@ -75,7 +75,7 @@ export function NovaOS() {
   }
 
   return (
-    <div className="p-6 md:p-8">
+    <div className="p-4 md:p-8">
       <div className="max-w-3xl mx-auto space-y-6">
         
         {/* Cabeçalho de Navegação */}
@@ -90,12 +90,12 @@ export function NovaOS() {
         </div>
 
         {/* Formulário Principal */}
-        <Card className="shadow-sm border-slate-200">
-          <CardHeader>
+        <Card className="shadow-none md:shadow-sm border-0 md:border-slate-200 bg-transparent md:bg-white">
+          <CardHeader className="px-1 md:px-6">
             <CardTitle>Detalhes da Operação</CardTitle>
             <CardDescription>Selecione o cliente e descreva o problema relatado.</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="px-1 md:px-6">
             {/* Banner quando oriundo de um Ticket WhatsApp */}
             {fromTicket && (
               <div className="mb-5 flex items-start gap-3 rounded-lg border border-blue-200 bg-blue-50 p-4">

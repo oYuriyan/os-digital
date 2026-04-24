@@ -38,30 +38,58 @@ async def webhook_evolution(request: Request, db: Session = Depends(get_db)):
     """
     payload = await request.json()
 
+    event_type = payload.get("event", "").upper()
+    print(f"[Webhook] Evento recebido: {event_type}")
+    print(f"[Webhook] Payload keys: {list(payload.keys())}")
+
     # A Evolution API encapsula os dados no campo "data"
     data = payload.get("data", payload)
-    telefone_raw = data.get("key", {}).get("remoteJid", "") or data.get("from", "")
-    # Remove sufixo "@s.whatsapp.net" se existir
-    telefone = telefone_raw.replace("@s.whatsapp.net", "").replace("@c.us", "")
-    mensagem_cliente = (
-        data.get("message", {}).get("conversation")
-        or data.get("message", {}).get("extendedTextMessage", {}).get("text")
-        or data.get("text", "")
-    )
 
-    event_type = payload.get("event", "").upper()
+    # ── Eventos de QR Code e conexão ──────────────────────────────────────────
     if event_type in ["QRCODE.UPDATED", "QRCODE_UPDATED", "CONNECTION.UPDATE", "CONNECTION_UPDATE"]:
-        qr_obj = data.get("qrcode", {})
-        base64_val = qr_obj.get("base64") or data.get("base64")
+        print(f"[Webhook] Evento QR/Conexão: {event_type}")
+        print(f"[Webhook] state={data.get('state')} statusReason={data.get('statusReason')}")
+        qr_obj = data.get("qrcode", {}) if isinstance(data, dict) else {}
+        base64_val = (
+            qr_obj.get("base64")
+            or data.get("base64")
+            or qr_obj.get("code")
+            or data.get("code")
+        ) if isinstance(data, dict) else None
+        print(f"[Webhook] base64 encontrado: {'SIM (' + str(len(str(base64_val))) + ' chars)' if base64_val else 'NAO'}")
         if base64_val:
             latest_qr["base64"] = base64_val
-        return {"ok": True, "msg": "QR Code registrado via Webhook"}
+            print("[Webhook] QR Code armazenado com sucesso!")
+        return {"ok": True, "msg": "QR Code/Conexão processado"}
+
+    telefone_raw = data.get("key", {}).get("remoteJid", "") or data.get("from", "") if isinstance(data, dict) else ""
+    # Se 'data' for lista (Evolution v2 às vezes manda lista de mensagens)
+    if isinstance(data, list) and len(data) > 0:
+        msg_obj = data[0]
+        telefone_raw = msg_obj.get("key", {}).get("remoteJid", "") or msg_obj.get("from", "")
+        mensagem_cliente = (
+            msg_obj.get("message", {}).get("conversation")
+            or msg_obj.get("message", {}).get("extendedTextMessage", {}).get("text")
+            or msg_obj.get("text", "")
+        )
+        is_from_me = msg_obj.get("key", {}).get("fromMe", False)
+    else:
+        mensagem_cliente = (
+            data.get("message", {}).get("conversation")
+            or data.get("message", {}).get("extendedTextMessage", {}).get("text")
+            or data.get("text", "")
+        ) if isinstance(data, dict) else ""
+        is_from_me = data.get("key", {}).get("fromMe", False) if isinstance(data, dict) else False
+
+    telefone = telefone_raw.replace("@s.whatsapp.net", "").replace("@c.us", "")
+    
+    print(f"[Webhook] Tentativa de parser de msg -> Telefone: {telefone} | Msg: {mensagem_cliente[:30] if mensagem_cliente else 'Vazio'} | fromMe: {is_from_me}")
 
     if not telefone or not mensagem_cliente:
         return {"ok": True, "msg": "Evento ignorado (sem telefone/mensagem)"}
 
     # Ignora mensagens próprias (bot enviando para si)
-    if data.get("key", {}).get("fromMe"):
+    if is_from_me:
         return {"ok": True, "msg": "Mensagem própria ignorada"}
 
     # ── 1. Busca ou cria chamado ativo para esse telefone ─────────────────────
@@ -100,26 +128,36 @@ async def webhook_evolution(request: Request, db: Session = Depends(get_db)):
         # Para o Groq, enviamos apenas "role" e "content"
         msgs_groq = [{"role": m["role"], "content": m["content"]} for m in historico_atual]
         resultado_ia = processar_mensagem_ia(msgs_groq)
+        
+        acao = resultado_ia.get("acao", "responder_cliente")
+        resposta_texto = resultado_ia.get("resposta_whatsapp", "")
+        
+        # Atualiza dados da IA se sucesso
+        chamado.resumo_ia = resultado_ia.get("resumo_ia", chamado.resumo_ia)
+        chamado.prioridade_ia = resultado_ia.get("prioridade_ia", "media")
+        chamado.categoria_ia = resultado_ia.get("categoria_ia", "duvida")
+        
     except Exception as e:
-        db.rollback()
-        raise HTTPException(status_code=503, detail=f"Falha na IA: {str(e)}")
+        print(f"[Webhook] Erro na IA: {e}")
+        # Contingência: Mensagem amigável para o cliente não ficar no vácuo
+        acao = "responder_cliente"
+        resposta_texto = (
+            "Desculpe, tive um pequeno problema técnico ao processar sua mensagem agora. "
+            "Mas não se preocupe, já registrei seu contato e um de nossos técnicos irá te atender em breve!"
+        )
+        # Em caso de erro na IA, forçamos o escalonamento humano para segurança
+        chamado.status = "aguardando_tecnico"
+        chamado.categoria_ia = "erro_ia"
 
-    acao = resultado_ia.get("acao", "responder_cliente")
-    resposta_texto = resultado_ia.get("resposta_whatsapp", "")
-
-    # Registra a resposta do assistente no histórico
+    # ── 4. Atualiza o histórico e salva no banco ────────────────────────────
     historico_atual.append({
         "role": "assistant",
         "content": resposta_texto,
         "timestamp": datetime.now(timezone.utc).isoformat(),
     })
-
-    # ── 4. Atualiza o chamado no banco ───────────────────────────────────────
+    
     chamado.historico_conversa = historico_atual
-    chamado.resumo_ia = resultado_ia.get("resumo_ia", chamado.resumo_ia)
-    chamado.prioridade_ia = resultado_ia.get("prioridade_ia", "media")
-    chamado.categoria_ia = resultado_ia.get("categoria_ia", "duvida")
-
+    
     if acao == "escalar_humano":
         chamado.status = "aguardando_tecnico"
 

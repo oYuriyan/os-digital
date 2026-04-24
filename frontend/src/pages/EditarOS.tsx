@@ -185,7 +185,7 @@ export function EditarOS() {
   const nomeArquivoPdf = `OS-${String(osOriginal?.numero_os).padStart(4, "0")}-${(cliente?.razao_social ?? "cliente").replace(/\s+/g, "_")}.pdf`
 
   return (
-    <div className="p-6 md:p-8 space-y-6 max-w-4xl mx-auto">
+    <div className="p-4 md:p-8 space-y-6 max-w-4xl mx-auto">
 
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -374,11 +374,11 @@ export function EditarOS() {
 
         {/* Coluna Direita */}
         <div className="lg:col-span-2">
-          <Card className="shadow-sm border-slate-200 bg-white">
-            <CardHeader>
+          <Card className="shadow-none md:shadow-sm border-0 md:border-slate-200 bg-transparent md:bg-white">
+            <CardHeader className="px-1 md:px-6">
               <CardTitle>{osTrancada ? "Relatório Final Aprovado" : "Resolução e Fechamento"}</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="px-1 md:px-6">
               <form onSubmit={handleSubmit} className="space-y-6">
 
                 <div className="space-y-2">

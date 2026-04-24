@@ -18,6 +18,8 @@ services:
       dockerfile: Dockerfile
     container_name: os_digital_backend
     restart: always
+    env_file:
+      - ./backend/.env
     ports:
       - "8001:8000"
     environment:
@@ -26,7 +28,6 @@ services:
       - SECRET_KEY=minha_chave_ultra_secreta_aqui_123*
       - ALGORITHM=HS256
       - ACCESS_TOKEN_EXPIRE_MINUTES=480
-      - GROQ_API_KEY=${GROQ_API_KEY}
       # URL interna da Evolution API para enviar mensagens de resposta
       - EVOLUTION_API_URL=http://evolution:8080
       - EVOLUTION_API_KEY=osdigital_evo_key_2026
@@ -47,22 +48,24 @@ services:
 
   # ── Evolution API v2 — Gateway WhatsApp ──────────────────────────────────────
   evolution:
-    image: atendai/evolution-api:v2.2.3
+    image: evoapicloud/evolution-api:latest
     container_name: os_digital_evolution
     restart: always
     ports:
       - "8080:8080"
     environment:
-      - SERVER_URL=http://localhost:8080
+      - SERVER_URL=http://evolution:8080
       - AUTHENTICATION_API_KEY=osdigital_evo_key_2026
       # Banco de dados PRÓPRIO da Evolution (separado do OS Digital)
       - DATABASE_PROVIDER=postgresql
       - DATABASE_CONNECTION_URI=postgresql://evo_user:evo_pass@evolution_db:5432/evolution
+      - DATABASE_CONNECTION_CLIENT_NAME=os_digital_bot
       # Webhook global — aponta para o backend do OS Digital (na rede interna Docker)
       - WEBHOOK_GLOBAL_URL=http://backend:8000/chamados/webhook/evolution
       - WEBHOOK_GLOBAL_ENABLED=true
       - WEBHOOK_GLOBAL_WEBHOOK_BY_EVENTS=false
-      - WEBHOOK_EVENTS=MESSAGES_UPSERT,QRCODE_UPDATED,CONNECTION_UPDATE
+      - WEBHOOK_GLOBAL_BASE64=true
+      - WEBHOOK_EVENTS=MESSAGES_UPSERT,QRCODE_UPDATED,CONNECTION_UPDATE,MESSAGES_UPDATE
       - LOG_LEVEL=WARN
     depends_on:
       - evolution_db

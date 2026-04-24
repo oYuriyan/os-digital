@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { User, LockKeyhole, Loader2, Briefcase } from "lucide-react"
+import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card"
+import { User, LockKeyhole, Loader2 } from "lucide-react"
 import { api } from "@/services/api"
 import { useAuth } from "@/contexts/AuthContext"
 
@@ -64,13 +64,10 @@ export function Login() {
         <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
 
         <CardHeader className="space-y-4 text-center pt-10 pb-8 px-8">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-white/5 border border-white/10 shadow-inner">
-             <Briefcase className="h-8 w-8 text-blue-400" />
+          <div className="mx-auto flex items-center justify-center mb-2">
+             <img src="/logo_oficial.png" alt="Micro Sistema Soluções" className="h-14 object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]" />
           </div>
           <div className="space-y-1">
-            <CardTitle className="text-2xl font-bold tracking-tight text-white">
-               OS Digital
-            </CardTitle>
             <CardDescription className="text-slate-400 text-sm font-medium">
                Painel Operacional Avançado
             </CardDescription>
@@ -109,9 +106,6 @@ export function Login() {
                 <Label htmlFor="password" className="text-xs font-semibold text-slate-300 uppercase tracking-wide">
                   Senha
                 </Label>
-                <a href="#" className="text-xs font-medium text-blue-400 hover:text-blue-300 transition-colors">
-                  Recuperar?
-                </a>
               </div>
               <div className="relative group">
                 <LockKeyhole className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500 group-focus-within:text-blue-400 transition-colors" />
